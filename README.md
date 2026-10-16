@@ -157,6 +157,17 @@ The database enforces the invariants with CHECK constraints (singleton row, vali
 
 It is a plain Node server with a SQLite file. Any small VPS or home server works.
 
+### Docker / Portainer
+
+`Dockerfile` + `docker-compose.yml` at the root, and nothing else. The app applies its migrations and seeds the admin at boot, so a deploy is build and restart.
+
+- **Portainer**: create a stack from the **Git repository** (build method "Repository", not the web editor: a pasted compose file has no source tree to build). Under Environment, set `ORIGIN` (required, e.g. `https://pop.example.com` or `http://192.168.1.20:3000`) and `ADMIN_DEFAULT_PASSWORD` (first boot only, min. 8 characters).
+- **Plain compose**: `cp .env.production.example .env`, edit it, then `docker compose up -d --build`.
+
+The database and the pictures live on the `pop-the-plan-data` volume (`/data`). The app serves plain HTTP on port 3000 (`HOST_PORT` / `BIND_ADDRESS` change how it is published); put your own HTTPS proxy in front. `GET /health` is the container health check.
+
+### Without Docker
+
 ```bash
 npm ci && npm run build
 # .env with ADMIN_DEFAULT_PASSWORD, ORIGIN=https://your.domain, BODY_SIZE_LIMIT=5M

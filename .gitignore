@@ -17,6 +17,7 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
+!.env.production.example
 
 # Vite
 vite.config.js.timestamp-*
@@ -24,6 +25,3 @@ vite.config.ts.timestamp-*
 
 # App data (database + uploaded pictures)
 /data
-
-# Docker deploy settings
-docker.env
