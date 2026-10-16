@@ -1,0 +1,76 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/inter';
+@import '@fontsource-variable/fraunces';
+@plugin '@tailwindcss/forms';
+
+/*
+ * Design tokens. Warm ivory rather than pure white, rose gold as the only accent.
+ * Verdict colours: love = rose, nope = taupe, maybe = champagne.
+ */
+@theme {
+	--font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+	--font-serif: 'Fraunces Variable', ui-serif, Georgia, serif;
+
+	--color-ivory: #f6f1ea;
+	--color-pearl: #fcfaf6;
+	--color-line: #e7ded2;
+	--color-ink: #2e2926;
+	--color-taupe: #8a7f75;
+	--color-rose: #b5707a;
+	--color-rose-soft: #f1dfdc;
+	--color-champagne: #b8955a;
+	--color-champagne-soft: #f2e7d3;
+
+	--shadow-card: 0 1px 2px rgb(46 41 38 / 0.04), 0 8px 24px -8px rgb(46 41 38 / 0.18);
+}
+
+@layer base {
+	html {
+		-webkit-tap-highlight-color: transparent;
+	}
+	body {
+		@apply bg-ivory font-sans text-ink antialiased;
+	}
+	h1,
+	h2,
+	h3 {
+		@apply font-serif tracking-tight;
+	}
+}
+
+/* Reusable component classes (Tailwind v4 custom utilities). */
+@utility btn {
+	@apply inline-flex h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-medium transition active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50;
+}
+
+@utility btn-primary {
+	@apply btn bg-ink text-pearl hover:bg-ink/90;
+}
+
+@utility btn-secondary {
+	@apply btn border border-line bg-pearl text-ink hover:bg-white;
+}
+
+@utility btn-danger {
+	@apply btn bg-rose text-white hover:bg-rose/90;
+}
+
+@utility panel {
+	@apply rounded-3xl border border-line bg-pearl p-5;
+}
+
+@utility label {
+	@apply mb-1.5 block text-xs font-medium tracking-wide text-taupe uppercase;
+}
+
+@utility input {
+	@apply block h-12 w-full rounded-2xl border-line bg-white px-4 text-base text-ink placeholder:text-taupe/60 focus:border-rose focus:ring-rose;
+}
+
+@utility textarea {
+	@apply input h-auto min-h-24 py-3;
+}
+
+@utility error-text {
+	@apply text-sm text-rose;
+}

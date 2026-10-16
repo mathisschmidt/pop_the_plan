@@ -1,0 +1,84 @@
+# Builds the image and runs it. One service, one volume, nothing else.
+#
+# Portainer: deploy this as a stack from the Git repository ("Repository" as
+# the build method, not the web editor). A pasted compose file has no source
+# tree, so `build:` below has nothing to build from. Set the variables under
+# the stack's Environment section (see docker.env.example).
+#
+# Plain compose:
+#   cp docker.env.example docker.env && $EDITOR docker.env
+#   docker compose --env-file docker.env up -d --build
+#
+# The app serves plain HTTP. Put your own reverse proxy in front of it if you
+# are exposing it to the internet.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${IMAGE:-pop-the-plan:latest}
+    restart: unless-stopped
+    # Reaps zombies and forwards SIGTERM so adapter-node can shut down cleanly.
+    init: true
+    # Must be able to write to the data volume. 1000:1000 = the image's `node` user.
+    user: '${PUID:-1000}:${PGID:-1000}'
+
+    environment:
+      NODE_ENV: production
+      PORT: ${PORT:-3000}
+      TZ: ${TZ:-UTC}
+      # The database and the pictures live on the volume, not in the image.
+      DATABASE_PATH: /data/pop-the-plan.db
+      UPLOAD_DIR: /data/uploads
+
+      # First boot only (min. 8 characters); ignored once the database exists.
+      # Change it afterwards in the dashboard (Settings > My password).
+      ADMIN_DEFAULT_PASSWORD: ${ADMIN_DEFAULT_PASSWORD:?required on first boot, min. 8 characters}
+
+      # The exact URL you open the app with: scheme + host (+ port when not
+      # 80/443), no trailing slash. Used for CSRF checks and Secure cookies;
+      # wrong or missing and every form (login included) is rejected.
+      # Read at runtime: change it and restart, no rebuild needed.
+      ORIGIN: ${ORIGIN:?required, e.g. https://pop.example.com or http://192.168.1.20:3000}
+
+      # Cropped uploads are ~0.5 MB; keep some margin.
+      BODY_SIZE_LIMIT: ${BODY_SIZE_LIMIT:-5M}
+      # Seconds to finish in-flight requests on stop.
+      SHUTDOWN_TIMEOUT: ${SHUTDOWN_TIMEOUT:-30}
+
+    volumes:
+      # The SQLite file and the ring pictures. Losing this loses everything.
+      # A named volume by default; set DATA_PATH to a host folder for a bind mount.
+      - ${DATA_PATH:-pop-the-plan-data}:/data
+
+    # Published on every interface so a phone on the same network can reach it.
+    # Set HOST_BIND=127.0.0.1 if a reverse proxy on this host is the only
+    # thing that should talk to it.
+    ports:
+      - '${HOST_BIND:-0.0.0.0}:${HOST_PORT:-3000}:${PORT:-3000}'
+
+    # The image defines the check; this repeats it so the stack reacts to it.
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+        ]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+
+    logging:
+      driver: json-file
+      options:
+        max-size: '10m'
+        max-file: '5'
+
+# SQLite is a single writer against a single file: never scale this service
+# past one replica, and never point two stacks at the same volume.
+volumes:
+  pop-the-plan-data:
