@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Pop the Plan: a private, phone-first SvelteKit app. The fiancée swipes engagement rings (like / dislike / maybe + reason). The single admin manages the pictures and reads her verdicts. See README.md for features and deployment.
+Pop the Plan: a private, phone-first SvelteKit app to prepare a proposal. The fiancée swipes pictures (like / dislike / maybe + reason) in decks: the engagement ring, and the dress and shoes the admin picks for her to wear that day. The admin chooses which decks are open. Wording she sees must stay vague (never hint at the proposal). The single admin manages the pictures and reads her verdicts. See README.md for features and deployment.
 
 ## Commands
 
@@ -37,8 +37,9 @@ routes/       thin: parse input → call service → map to HTTP / fail() / redi
 - Get services with `await getServices()` (lazy singleton). Never instantiate repositories in routes.
 - Business rules go in services or `domain/`, not in `+page.server.ts`. Validation shared with the UI belongs in `domain/`.
 - **Access control is centralised** in `lib/server/auth/access.ts` (prefix rules) and enforced in `hooks.server.ts`. When you add a protected area, add a rule there and a test in `access.spec.ts`. Do not rely on layout `load` guards, because they do not protect actions or endpoints.
-- Roles: `admin` (single account, password) and `guest` (her, code + riddle). The admin can view `/rings` in preview mode, but the verdict endpoint rejects admin votes (403).
-- Every ring picture is normalised server-side to `RING_IMAGE` (1080×1350 WebP) by `normalizeRingImage`. The client crops to JPEG first. Keep the server as the source of truth.
+- Roles: `admin` (single account, password) and `guest` (her, code + riddle). The admin can view `/swipe/*` in preview mode (any deck, even closed), but the verdict endpoint rejects admin votes (403).
+- Decks: `CATEGORIES` / `CATEGORY_META` in `domain/category.ts` (labels, units, intro, maybe-suggestions). Every picture row (table `rings`) has a `category`; open decks are stored in `app_settings.open_categories` and read via `DeckService`. Verdicts on a closed deck are refused.
+- Every picture is normalised server-side to `RING_IMAGE` (1080×1350 WebP) by `normalizeRingImage`. The client crops to JPEG first. Keep the server as the source of truth.
 - Pictures are served only through `/media/rings/[id]` (auth required). Storage keys are generated (uuid), never user-provided.
 
 ## Database

@@ -11,7 +11,7 @@ export const POST: RequestHandler = async ({ params, request, locals }) => {
 	if (!parsed.ok) error(400, parsed.error);
 
 	const { rings } = await getServices();
-	if (!rings.decide(params.id, parsed.value)) error(409, 'This ring was already decided');
+	if (!rings.decide(params.id, parsed.value)) error(409, 'This one is no longer up for review');
 
 	return json({ ok: true });
 };

@@ -3,6 +3,8 @@
 
 	interface Props {
 		imageUrl: string;
+		/** Accessible description of the picture. */
+		alt: string;
 		/** 0 = top card (draggable), 1 = the one peeking behind. */
 		depth: number;
 		/**
@@ -12,7 +14,7 @@
 		onswipe: (direction: SwipeDirection) => boolean | Promise<boolean>;
 	}
 
-	let { imageUrl, depth, onswipe }: Props = $props();
+	let { imageUrl, alt, depth, onswipe }: Props = $props();
 
 	const FLY_MS = 280;
 
@@ -94,7 +96,7 @@
 	onpointercancel={onpointerup}
 	role="presentation"
 >
-	<img src={imageUrl} alt="Ring" class="size-full object-cover" draggable="false" />
+	<img src={imageUrl} {alt} class="size-full object-cover" draggable="false" />
 
 	{#if depth === 0}
 		<span class="stamp top-8 left-6 -rotate-12 border-rose text-rose" style:opacity={progress.right}

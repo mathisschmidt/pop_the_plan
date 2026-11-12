@@ -1,13 +1,15 @@
 <script lang="ts">
-	import Icon from '#lib/components/ui/Icon.svelte';
+	import Icon, { type IconName } from '#lib/components/ui/Icon.svelte';
 	import type { SwipeDirection } from './swipe.ts';
 
 	interface Props {
 		direction: SwipeDirection;
 		size?: 'sm' | 'lg';
+		/** What the mini-card shows (the current deck). */
+		icon?: IconName;
 	}
 
-	let { direction, size = 'lg' }: Props = $props();
+	let { direction, size = 'lg', icon = 'ring' }: Props = $props();
 
 	const MOTION: Record<SwipeDirection, { dx: string; dy: string; rot: string; stamp: string }> = {
 		right: { dx: '55%', dy: '4%', rot: '12deg', stamp: 'var(--color-rose)' },
@@ -33,7 +35,7 @@
 		style:--stamp={motion.stamp}
 		style:--amp={size === 'lg' ? 1 : 0.45}
 	>
-		<Icon name="ring" class={size === 'lg' ? 'size-10' : 'size-5'} />
+		<Icon name={icon} class={size === 'lg' ? 'size-10' : 'size-5'} />
 	</div>
 </div>
 

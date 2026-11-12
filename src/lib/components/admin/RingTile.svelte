@@ -6,14 +6,16 @@
 
 	interface Props {
 		ring: { id: string; imageUrl: string; reason: string | null; sourceUrl: string | null };
+		/** Accessible description of the picture (the deck name). */
+		alt: string;
 		canReset: boolean;
 	}
 
-	let { ring, canReset }: Props = $props();
+	let { ring, alt, canReset }: Props = $props();
 	let busy = $state(false);
 
 	const submit: SubmitFunction = ({ action, cancel }) => {
-		if (action.search.includes('delete') && !confirm('Delete this ring for good?')) {
+		if (action.search.includes('delete') && !confirm('Delete this picture for good?')) {
 			cancel();
 			return;
 		}
@@ -33,7 +35,7 @@
 <article class={['flex flex-col gap-2 transition', busy && 'opacity-50']}>
 	<img
 		src={ring.imageUrl}
-		alt="Ring"
+		{alt}
 		loading="lazy"
 		class="aspect-[4/5] w-full rounded-2xl bg-pearl object-cover"
 	/>

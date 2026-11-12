@@ -10,6 +10,8 @@ type Rule = { prefix: string; roles: readonly Role[] | 'public'; loginPath: stri
 const RULES: readonly Rule[] = [
 	{ prefix: '/admin/login', roles: 'public', loginPath: '/admin/login' },
 	{ prefix: '/admin', roles: ['admin'], loginPath: '/admin/login' },
+	{ prefix: '/swipe', roles: ['guest', 'admin'], loginPath: '/login' },
+	// Legacy home, now a redirect to /swipe.
 	{ prefix: '/rings', roles: ['guest', 'admin'], loginPath: '/login' },
 	{ prefix: '/media', roles: ['guest', 'admin'], loginPath: '/login' }
 ];
@@ -29,6 +31,6 @@ export function authorize(pathname: string, role: Role | null): AccessDecision {
 /** Where a signed-in user lands. */
 export function homePath(role: Role | null): string {
 	if (role === 'admin') return '/admin';
-	if (role === 'guest') return '/rings';
+	if (role === 'guest') return '/swipe';
 	return '/login';
 }

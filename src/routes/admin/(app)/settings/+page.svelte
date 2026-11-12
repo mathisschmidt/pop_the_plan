@@ -2,7 +2,10 @@
 	import { enhance } from '$app/forms';
 	import type { SubmitFunction } from '$app/forms';
 	import FormMessage from '#lib/components/ui/FormMessage.svelte';
+	import { CATEGORY_ICON } from '#lib/components/ui/categories.ts';
+	import Icon from '#lib/components/ui/Icon.svelte';
 	import SubmitButton from '#lib/components/ui/SubmitButton.svelte';
+	import { CATEGORIES, CATEGORY_META, countLabel } from '#lib/domain/category.ts';
 	import { GUEST_HINT_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '#lib/domain/auth.ts';
 	import type { PageProps } from './$types';
 
@@ -23,6 +26,49 @@
 </script>
 
 <h1 class="text-3xl">Settings</h1>
+
+<section class="flex flex-col gap-4 panel">
+	<header>
+		<h2 class="text-xl">What she's choosing</h2>
+		<p class="text-sm text-taupe">
+			She only sees the open decks. With more than one, she can switch between them.
+		</p>
+	</header>
+
+	<form
+		method="POST"
+		action="?/decks"
+		class="flex flex-col gap-4"
+		use:enhance={submitting('decks', false)}
+	>
+		<ul class="flex flex-col divide-y divide-line">
+			{#each CATEGORIES as category (category)}
+				<li>
+					<label class="flex min-h-12 cursor-pointer items-center gap-3 py-2">
+						<span class="grid size-9 place-items-center rounded-full bg-rose-soft text-rose">
+							<Icon name={CATEGORY_ICON[category]} class="size-4" />
+						</span>
+						<span class="flex-1">
+							<span class="block">{CATEGORY_META[category].label}</span>
+							<span class="text-xs text-taupe">
+								{countLabel(category, data.pending[category])} to review
+							</span>
+						</span>
+						<input
+							type="checkbox"
+							name="open"
+							value={category}
+							class="toggle"
+							checked={data.openDecks.includes(category)}
+						/>
+					</label>
+				</li>
+			{/each}
+		</ul>
+		<FormMessage result={form?.decks} />
+		<SubmitButton pending={pending === 'decks'}>Save decks</SubmitButton>
+	</form>
+</section>
 
 <section class="flex flex-col gap-4 panel">
 	<header>

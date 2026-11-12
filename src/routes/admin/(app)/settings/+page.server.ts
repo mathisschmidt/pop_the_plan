@@ -1,16 +1,30 @@
 import { fail } from '@sveltejs/kit';
+import { parseCategories } from '#lib/domain/category.ts';
 import { getServices } from '#lib/server/container.ts';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async () => {
-	const { auth, sessions } = await getServices();
-	return { guestAccess: auth.guestAccess(), guestDevices: sessions.countActive('guest') };
+	const { auth, sessions, decks, rings } = await getServices();
+	return {
+		guestAccess: auth.guestAccess(),
+		guestDevices: sessions.countActive('guest'),
+		openDecks: decks.open(),
+		pending: rings.pendingCounts()
+	};
 };
 
 const field = (form: FormData, name: string) => String(form.get(name) ?? '');
 
 /** Each form gets its own key so messages show next to the right form. */
 export const actions: Actions = {
+	decks: async ({ request }) => {
+		const form = await request.formData();
+		const open = (await getServices()).decks.setOpen(parseCategories(form.getAll('open')));
+		return {
+			decks: { message: open.length ? 'Saved.' : 'Saved. Every deck is closed for now.' }
+		};
+	},
+
 	password: async ({ request, locals }) => {
 		const form = await request.formData();
 		const outcome = await (

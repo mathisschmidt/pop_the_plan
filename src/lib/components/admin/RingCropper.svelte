@@ -49,5 +49,5 @@
 			<Icon name="rotate" />
 		</button>
 	</div>
-	<p class="text-center text-xs text-taupe">Drag and pinch to frame the ring.</p>
+	<p class="text-center text-xs text-taupe">Drag and pinch to frame the picture.</p>
 </div>

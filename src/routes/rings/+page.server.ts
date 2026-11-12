@@ -1,12 +1,7 @@
-import { ringImageUrl } from '#lib/domain/ring.ts';
-import { getServices } from '#lib/server/container.ts';
+import { redirect } from '@sveltejs/kit';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ locals }) => {
-	const { rings } = await getServices();
-	return {
-		rings: rings.list('pending').map((ring) => ({ id: ring.id, imageUrl: ringImageUrl(ring.id) })),
-		// The admin can try the experience, but their swipes are never recorded.
-		preview: locals.session?.role === 'admin'
-	};
+// Before decks existed, her home was /rings: keep old links and bookmarks working.
+export const load: PageServerLoad = () => {
+	redirect(308, '/swipe');
 };

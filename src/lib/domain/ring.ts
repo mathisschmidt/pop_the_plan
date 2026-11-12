@@ -1,5 +1,7 @@
+import type { Category } from './category';
+
 /**
- * Ring domain: shared by server and client. Must stay free of any runtime dependency.
+ * Ring domain (every swipeable picture: rings, dresses, shoes): shared by server and client. Must stay free of any runtime dependency.
  */
 
 /** Every ring picture is normalised to this exact size (portrait 4:5, like a phone card). */
@@ -22,6 +24,7 @@ export const REASON_MAX_LENGTH = 280;
 
 export interface Ring {
 	id: string;
+	category: Category;
 	status: RingStatus;
 	reason: string | null;
 	sourceUrl: string | null;

@@ -3,19 +3,13 @@
 	import { REASON_MAX_LENGTH } from '#lib/domain/ring.ts';
 
 	interface Props {
+		/** Quick chips for the current deck. */
+		suggestions: readonly string[];
 		onsubmit: (reason: string) => void;
 		oncancel: () => void;
 	}
 
-	let { onsubmit, oncancel }: Props = $props();
-
-	const SUGGESTIONS = [
-		'Stone too big',
-		'Stone too small',
-		'Not my metal',
-		'Too flashy',
-		'Band too thick'
-	];
+	let { suggestions, onsubmit, oncancel }: Props = $props();
 
 	let reason = $state('');
 	const trimmed = $derived(reason.trim());
@@ -44,7 +38,7 @@
 	<h2 class="text-2xl italic">Maybe, but…</h2>
 
 	<div class="flex flex-wrap gap-2">
-		{#each SUGGESTIONS as suggestion (suggestion)}
+		{#each suggestions as suggestion (suggestion)}
 			<button
 				type="button"
 				class="rounded-full border border-line bg-white px-3 py-1.5 text-sm text-taupe active:bg-champagne-soft"

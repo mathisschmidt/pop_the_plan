@@ -1,17 +1,22 @@
 import { fail } from '@sveltejs/kit';
+import { isCategory } from '#lib/domain/category.ts';
 import { isRingStatus, ringImageUrl } from '#lib/domain/ring.ts';
 import { getServices } from '#lib/server/container.ts';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url }) => {
-	const param = url.searchParams.get('status');
-	const status = isRingStatus(param) ? param : 'pending';
-	const { rings } = await getServices();
+	const deckParam = url.searchParams.get('deck');
+	const statusParam = url.searchParams.get('status');
+	const deck = isCategory(deckParam) ? deckParam : 'ring';
+	const status = isRingStatus(statusParam) ? statusParam : 'pending';
+	const { rings, decks } = await getServices();
 
 	return {
+		deck,
 		status,
-		counts: rings.counts(),
-		rings: rings.list(status).map((ring) => ({
+		openDecks: decks.open(),
+		counts: rings.counts(deck),
+		rings: rings.list(deck, status).map((ring) => ({
 			id: ring.id,
 			imageUrl: ringImageUrl(ring.id),
 			reason: ring.reason,
@@ -26,12 +31,12 @@ const ringId = async (request: Request) => String((await request.formData()).get
 export const actions: Actions = {
 	delete: async ({ request }) => {
 		const { rings } = await getServices();
-		if (!(await rings.remove(await ringId(request)))) return fail(404, { error: 'Ring not found' });
-		return { message: 'Ring deleted' };
+		if (!(await rings.remove(await ringId(request)))) return fail(404, { error: 'Not found' });
+		return { message: 'Deleted' };
 	},
 	reset: async ({ request }) => {
 		const { rings } = await getServices();
-		if (!rings.resetVerdict(await ringId(request))) return fail(404, { error: 'Ring not found' });
+		if (!rings.resetVerdict(await ringId(request))) return fail(404, { error: 'Not found' });
 		return { message: 'Back in her pile' };
 	}
 };

@@ -5,12 +5,12 @@
 
 	const LINKS = [
 		{ href: '/admin/(app)', label: 'Overview', icon: 'home' },
-		{ href: '/admin/(app)/rings', label: 'Rings', icon: 'ring' },
+		{ href: '/admin/(app)/rings', label: 'Gallery', icon: 'ring' },
 		{ href: '/admin/(app)/rings/new', label: 'Add', icon: 'plus' },
 		{ href: '/admin/(app)/settings', label: 'Settings', icon: 'settings' }
 	] as const satisfies readonly { href: string; label: string; icon: IconName }[];
 
-	// Match on the route id; the most specific link wins ("/rings/new" does not light up "Rings").
+	// Match on the route id; the most specific link wins ("/rings/new" does not light up "Gallery").
 	const active = $derived(
 		LINKS.filter(({ href }) => page.route.id?.startsWith(href)).sort(
 			(a, b) => b.href.length - a.href.length

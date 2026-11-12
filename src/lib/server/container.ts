@@ -9,6 +9,7 @@ import { PASSWORD_MIN_LENGTH } from '#lib/domain/auth.ts';
 import { AuthService } from './auth/auth-service';
 import { SessionService } from './auth/session-service';
 import { openDatabase } from './db/client';
+import { DeckService } from './decks/deck-service';
 import { RingRepository } from './rings/ring-repository';
 import { RingService } from './rings/ring-service';
 import { parseOrigin } from './security/csrf';
@@ -25,6 +26,7 @@ export interface Services {
 	auth: AuthService;
 	sessions: SessionService;
 	rings: RingService;
+	decks: DeckService;
 	loginLimiter: RateLimiter;
 	/** Public origin from ORIGIN; `undefined` = derive it from each request (dev). */
 	origin: string | undefined;
@@ -41,11 +43,13 @@ async function build(): Promise<Services> {
 
 	const sessions = new SessionService(db);
 	sessions.purgeExpired();
+	const decks = new DeckService(settings);
 
 	return {
 		auth: new AuthService(settings, sessions),
 		sessions,
-		rings: new RingService(new RingRepository(db), new ImageStore(`${UPLOAD_DIR}/rings`)),
+		rings: new RingService(new RingRepository(db), new ImageStore(`${UPLOAD_DIR}/rings`), decks),
+		decks,
 		loginLimiter: new RateLimiter(10, 15 * 60 * 1000),
 		origin: ORIGIN ? parseOrigin(ORIGIN) : undefined
 	};

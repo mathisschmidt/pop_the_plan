@@ -4,23 +4,27 @@ A tiny, private web app to plan a marriage proposal.
 
 She swipes engagement rings like on Tinder (**right** = love, **left** = nope, **down** = _maybe, but…_ with a reason). You manage the ring pictures and read her verdicts from an admin dashboard. It is built for phones first.
 
+The same swipe works for the **outfit you pick for her**: besides the **ring** deck, there is a **dress** deck and a **shoes** deck. You decide which decks she can see; the wording stays vague so nothing hints at a special day.
+
 ---
 
 ## Features
 
-**For her** (`/login` → `/rings`)
+**For her** (`/login` → `/swipe`)
 
 - Signs in by answering **a riddle you wrote** (the answer is the access code). Case, accents and punctuation are ignored, so `Café de Flore!` matches `cafe de flore`.
-- Swipes through the rings she has not reviewed yet: drag gestures, buttons, or arrow keys.
+- Swipes through the pictures she has not reviewed yet: drag gestures, buttons, or arrow keys.
+- When more than one deck is open, a pill under the logo switches between them (with what's left in each). When a deck is done, she is pointed to the next one that still has pictures.
 - On her first visit, a short **tour** shows each gesture with an animated mini-card. Afterwards, the **?** button in the header opens a one-page reminder. "Already seen" is remembered per device in `localStorage`; if storage isn't available, the tour just shows again.
+- Each newly opened deck gets a one-time intro card (the gestures tour is not repeated).
 - "Maybe, but…" opens a bottom sheet with quick suggestions and a free-text reason (required).
 
 **For you** (`/admin`)
 
-- **Overview**: counts per verdict, her access status, and a _preview_ of her experience (your swipes there are never saved).
-- **Rings**: filter by _to review / love / nope / maybe_, read the "maybe" reasons, send a ring back for review, delete it, open its source link.
-- **Add a ring** from your phone gallery or from an image URL, then **crop / zoom / rotate** it. Every picture is normalised to the same format: **1080×1350 WebP (4:5)**.
-- **Settings**: change your password, set or change her riddle and code, sign her out, or close her access.
+- **Overview**: counts per verdict for each deck, her access status, and a _preview_ of her experience (your swipes there are never saved).
+- **Gallery**: filter by deck, then by _to review / love / nope / maybe_; read the "maybe" reasons, send a picture back for review, delete it, open its source link.
+- **Add a picture** (ring, dress or shoes) from your phone gallery or from an image URL, then **crop / zoom / rotate** it. Every picture is normalised to the same format: **1080×1350 WebP (4:5)**.
+- **Settings**: choose which decks she can see, change your password, set or change her riddle and code, sign her out, or close her access.
 
 ## Stack
 
@@ -54,7 +58,7 @@ Then:
 
 1. Sign in at **`/admin/login`** with that password. A banner reminds you to change it. Do it in **Settings**.
 2. In **Settings → Her secret code**, write the riddle and its answer.
-3. Add a few rings.
+3. Add a few rings (and, whenever you're ready, dresses and shoes; open their decks in **Settings → What she's choosing**).
 4. Send her the link. She lands on `/login`, reads the riddle and starts swiping.
 
 > `ADMIN_DEFAULT_PASSWORD` is used **only** when the database is created. Changing it later has no effect. To start over, stop the app and delete the `data/` folder.
@@ -96,21 +100,24 @@ src/
 ├── lib/
 │   ├── domain/                 # Pure, shared (server + browser) rules & types. No I/O.
 │   │   ├── ring.ts             #   verdicts, statuses, image format, verdict validation
+│   │   ├── category.ts         #   decks (ring / dress / shoes) and their wording
 │   │   └── auth.ts             #   roles, guest-code normalisation, limits
 │   ├── server/                 # Server-only (SvelteKit forbids importing it client-side)
 │   │   ├── container.ts        #   Composition root: reads env, wires everything, lazy singleton
 │   │   ├── db/                 #   Drizzle schema + connection/migration
 │   │   ├── auth/               #   access policy, sessions, auth service, cookie & login helpers
 │   │   ├── rings/              #   repository, service, image normalisation, remote fetch
+│   │   ├── decks/              #   which decks are open to her
 │   │   ├── settings/           #   singleton settings repository
 │   │   ├── storage/            #   file storage for pictures
 │   │   ├── security/           #   password hashing, rate limiter
 │   │   └── testing/            #   test fixtures (in-memory DB, temp dirs)
 │   ├── client/                 # Browser-only helpers (canvas crop/rotate)
-│   └── components/             # UI: ui/ (primitives), rings/ (swipe), admin/
+│   └── components/             # UI: ui/ (primitives), swipe/ (deck, cards, guide), admin/
 └── routes/
     ├── login/                  # Her riddle login
-    ├── rings/                  # Swipe deck + POST /rings/[id]/verdict
+    ├── swipe/                  # Her home, [category=category] decks, POST /swipe/verdict/[id]
+    ├── rings/                  # Legacy redirect to /swipe
     ├── media/rings/[id]/       # Authenticated image serving
     ├── logout/
     └── admin/
@@ -132,15 +139,16 @@ src/
 - **Access control lives in `hooks.server.ts`** via a declarative policy (`server/auth/access.ts`), not in layout `load` functions, because those do not protect form actions or endpoints.
 - **Image pipeline**: the browser crops (canvas → JPEG, which every mobile browser can encode), then the server re-encodes with `sharp` to the canonical **1080×1350 WebP** and strips metadata. The server never trusts the client's format.
 - **Remote images** go through an admin-only proxy (`/admin/rings/remote`), because a canvas cannot export cross-origin images. It accepts only http(s) URLs, checks that the response is an image, and enforces a size limit and a timeout.
-- **One verdict per ring**: the update only applies while the ring is `pending`, so a double tap or a second device gets a `409`. The admin can send a ring back to review.
+- **One verdict per picture**: the update only applies while the picture is `pending` and its deck is open, so a double tap, a second device or a deck closed meanwhile gets a `409`. The admin can send a picture back to review.
+- **Decks are one table**: rings, dresses and shoes all live in `rings` with a `category` column; deck metadata and wording live in `domain/category.ts`, and the route only accepts known decks through a param matcher (`src/params.ts`).
 - **Pictures are private**: `/media/**` requires a session, and responses are `Cache-Control: private, immutable` (ids are never reused).
 
 ## Data model
 
 ```
-app_settings (singleton id=1)  admin_password_hash, admin_password_is_default, guest_code_hash, guest_hint
+app_settings (singleton id=1)  admin_password_hash, admin_password_is_default, guest_code_hash, guest_hint, open_categories (JSON array)
 sessions                       id = sha256(token), role ∈ {admin, guest}, expires_at
-rings                          id (uuid), status ∈ {pending, like, dislike, maybe}, reason (iff maybe), source_url, created_at, decided_at
+rings                          id (uuid), category ∈ {ring, dress, shoes}, status ∈ {pending, like, dislike, maybe}, reason (iff maybe), source_url, created_at, decided_at
 ```
 
 The database enforces the invariants with CHECK constraints (singleton row, valid enums, `reason` present only for `maybe`).

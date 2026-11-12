@@ -1,16 +1,25 @@
 <script lang="ts">
 	import { fade, fly } from 'svelte/transition';
+	import { CATEGORY_ICON } from '#lib/components/ui/categories.ts';
 	import Icon, { type IconName } from '#lib/components/ui/Icon.svelte';
+	import { CATEGORY_META, type Category } from '#lib/domain/category.ts';
 	import GestureDemo from './GestureDemo.svelte';
 	import type { SwipeDirection } from './swipe.ts';
 
 	interface Props {
-		/** `true` the first time: a step-by-step tour. `false`: a one-page reminder (the "?" button). */
-		tour: boolean;
+		/**
+		 * `tour`: first visit, the deck intro then one step per gesture.
+		 * `intro`: she knows the gestures, only the new deck's intro.
+		 * `help`: a one-page reminder (the "?" button).
+		 */
+		mode: 'tour' | 'intro' | 'help';
+		category: Category;
 		onclose: () => void;
 	}
 
-	let { tour, onclose }: Props = $props();
+	let { mode, category, onclose }: Props = $props();
+	const tour = $derived(mode !== 'help');
+	const icon = $derived(CATEGORY_ICON[category]);
 
 	const GESTURES: {
 		direction: SwipeDirection;
@@ -42,9 +51,9 @@
 		}
 	];
 
-	// Tour: intro, then one step per gesture.
+	// Tour: intro, then one step per gesture. Intro mode stops after the first step.
 	let step = $state(0);
-	const lastStep = GESTURES.length;
+	const lastStep = $derived(mode === 'intro' ? 0 : GESTURES.length);
 	const gesture = $derived(GESTURES[step - 1]);
 
 	function onkeydown(event: KeyboardEvent) {
@@ -70,15 +79,14 @@
 			<div class="flex min-h-72 flex-col items-center justify-center gap-4 text-center" in:fade>
 				{#if step === 0}
 					<span class="grid size-16 place-items-center rounded-full bg-rose-soft text-rose">
-						<Icon name="ring" class="size-8" />
+						<Icon name={icon} class="size-8" />
 					</span>
-					<h2 id="guide-title" class="text-3xl italic">Welcome</h2>
-					<p class="text-taupe">
-						A few rings are waiting for you. Tell me honestly what you think of each one, there is
-						no wrong answer.
-					</p>
+					<h2 id="guide-title" class="text-3xl italic">
+						{mode === 'intro' ? 'Something new' : 'Welcome'}
+					</h2>
+					<p class="text-taupe">{CATEGORY_META[category].intro}</p>
 				{:else}
-					<GestureDemo direction={gesture.direction} />
+					<GestureDemo direction={gesture.direction} {icon} />
 					<h2 id="guide-title" class="text-3xl italic">{gesture.title}</h2>
 					<p class="text-ink">{gesture.meaning}</p>
 					<p class="flex items-center gap-1.5 text-xs text-taupe">
@@ -92,16 +100,18 @@
 			</div>
 		{/key}
 
-		<div class="flex justify-center gap-2" aria-hidden="true">
-			{#each { length: lastStep + 1 }, i (i)}
-				<span
-					class={[
-						'h-1.5 rounded-full transition-all',
-						i === step ? 'w-5 bg-rose' : 'w-1.5 bg-line'
-					]}
-				></span>
-			{/each}
-		</div>
+		{#if lastStep > 0}
+			<div class="flex justify-center gap-2" aria-hidden="true">
+				{#each { length: lastStep + 1 }, i (i)}
+					<span
+						class={[
+							'h-1.5 rounded-full transition-all',
+							i === step ? 'w-5 bg-rose' : 'w-1.5 bg-line'
+						]}
+					></span>
+				{/each}
+			</div>
+		{/if}
 
 		<div class="grid grid-cols-2 gap-3">
 			{#if step < lastStep}
@@ -116,7 +126,7 @@
 		<ul class="flex flex-col gap-4">
 			{#each GESTURES as item (item.direction)}
 				<li class="flex items-center gap-4">
-					<GestureDemo direction={item.direction} size="sm" />
+					<GestureDemo direction={item.direction} size="sm" {icon} />
 					<div class="flex-1">
 						<p class="font-medium">{item.title}</p>
 						<p class="text-sm text-taupe">{item.meaning}</p>

@@ -14,9 +14,17 @@ export const appSettings = sqliteTable(
 			.default(true),
 		guestCodeHash: text('guest_code_hash'),
 		guestHint: text('guest_hint'),
+		/** JSON array of the decks open to her (see `domain/category.ts`). */
+		openCategories: text('open_categories').notNull().default('["ring"]'),
 		updatedAt: timestamp('updated_at').notNull()
 	},
-	(t) => [check('app_settings_singleton', sql`${t.id} = 1`)]
+	(t) => [
+		check('app_settings_singleton', sql`${t.id} = 1`),
+		check(
+			'app_settings_open_categories_check',
+			sql`json_valid(${t.openCategories}) and json_type(${t.openCategories}) = 'array'`
+		)
+	]
 );
 
 export const sessions = sqliteTable(
@@ -38,6 +46,9 @@ export const rings = sqliteTable(
 	'rings',
 	{
 		id: text('id').primaryKey(),
+		category: text('category', { enum: ['ring', 'dress', 'shoes'] })
+			.notNull()
+			.default('ring'),
 		status: text('status', { enum: ['pending', 'like', 'dislike', 'maybe'] })
 			.notNull()
 			.default('pending'),
@@ -47,7 +58,8 @@ export const rings = sqliteTable(
 		decidedAt: timestamp('decided_at')
 	},
 	(t) => [
-		index('rings_status_idx').on(t.status, t.createdAt),
+		index('rings_category_status_idx').on(t.category, t.status, t.createdAt),
+		check('rings_category_check', sql`${t.category} in ('ring', 'dress', 'shoes')`),
 		check('rings_status_check', sql`${t.status} in ('pending', 'like', 'dislike', 'maybe')`),
 		check('rings_reason_check', sql`(${t.status} = 'maybe') = (${t.reason} is not null)`)
 	]
