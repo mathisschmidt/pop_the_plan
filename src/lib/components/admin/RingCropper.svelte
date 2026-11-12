@@ -15,6 +15,10 @@
 
 	let crop = $state({ x: 0, y: 0 });
 	let zoom = $state(1);
+
+	/** Below 1 the whole picture fits inside the frame; the margin is filled when exported. */
+	const MIN_ZOOM = 0.5;
+	const MAX_ZOOM = 4;
 </script>
 
 <div class="flex flex-col gap-4">
@@ -24,7 +28,9 @@
 			bind:crop
 			bind:zoom
 			aspect={RING_IMAGE.aspect}
-			maxZoom={4}
+			minZoom={MIN_ZOOM}
+			maxZoom={MAX_ZOOM}
+			restrictPosition={zoom >= 1}
 			oncropcomplete={(event) => oncrop(event.pixels)}
 		/>
 	</div>
@@ -34,8 +40,8 @@
 		<input
 			id="zoom"
 			type="range"
-			min="1"
-			max="4"
+			min={MIN_ZOOM}
+			max={MAX_ZOOM}
 			step="0.01"
 			bind:value={zoom}
 			class="h-1 flex-1 accent-rose"
@@ -49,5 +55,7 @@
 			<Icon name="rotate" />
 		</button>
 	</div>
-	<p class="text-center text-xs text-taupe">Drag and pinch to frame the picture.</p>
+	<p class="text-center text-xs text-taupe">
+		Drag and pinch to frame the picture. Zoom out to fit it whole.
+	</p>
 </div>

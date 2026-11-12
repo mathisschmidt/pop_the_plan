@@ -50,7 +50,8 @@ export async function rotateClockwise(src: string): Promise<string> {
 }
 
 /**
- * Cuts `area` out of the picture and scales it to the output size.
+ * Cuts `area` out of the picture and scales it to the output size. `area` may extend
+ * past the picture (zoomed out); the uncovered part stays white.
  * JPEG because every mobile browser can encode it (Safari cannot encode WebP);
  * the server converts it to the canonical WebP anyway.
  */
@@ -68,7 +69,28 @@ export async function cropToBlob(
 	ctx.imageSmoothingQuality = 'high';
 	ctx.fillStyle = '#ffffff'; // transparent PNGs get a clean background instead of black
 	ctx.fillRect(0, 0, output.width, output.height);
-	ctx.drawImage(image, area.x, area.y, area.width, area.height, 0, 0, output.width, output.height);
+
+	// When zoomed out, `area` reaches past the picture's edges: draw only the part that
+	// exists, at the matching spot, and leave the rest as the background fill.
+	const scaleX = output.width / area.width;
+	const scaleY = output.height / area.height;
+	const sx = Math.max(0, area.x);
+	const sy = Math.max(0, area.y);
+	const sw = Math.min(image.naturalWidth, area.x + area.width) - sx;
+	const sh = Math.min(image.naturalHeight, area.y + area.height) - sy;
+	if (sw > 0 && sh > 0) {
+		ctx.drawImage(
+			image,
+			sx,
+			sy,
+			sw,
+			sh,
+			(sx - area.x) * scaleX,
+			(sy - area.y) * scaleY,
+			sw * scaleX,
+			sh * scaleY
+		);
+	}
 
 	return canvasToBlob(canvas, 'image/jpeg', 0.92);
 }
