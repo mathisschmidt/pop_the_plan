@@ -14,7 +14,7 @@ The same swipe works for the **outfit you pick for her**: besides the **ring** d
 
 - Signs in by answering **a riddle you wrote** (the answer is the access code). Case, accents and punctuation are ignored, so `Café de Flore!` matches `cafe de flore`.
 - Swipes through the pictures she has not reviewed yet: drag gestures, buttons, or arrow keys.
-- When more than one deck is open, a pill under the logo switches between them (with what's left in each). When a deck is done, she is pointed to the next one that still has pictures.
+- When more than one deck is open, the icon next to _Pop the Plan_ shows the current deck; a tap opens a small menu to switch (with what's left in each), the same menu as on the admin side. When a deck is done, she is pointed to the next one that still has pictures.
 - On her first visit, a short **tour** shows each gesture with an animated mini-card. Afterwards, the **?** button in the header opens a one-page reminder. "Already seen" is remembered per device in `localStorage`; if storage isn't available, the tour just shows again.
 - Each newly opened deck gets a one-time intro card (the gestures tour is not repeated).
 - "Maybe, but…" opens a bottom sheet with quick suggestions and a free-text reason (required).

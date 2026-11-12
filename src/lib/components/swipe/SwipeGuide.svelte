@@ -14,10 +14,12 @@
 		 */
 		mode: 'tour' | 'intro' | 'help';
 		category: Category;
+		/** Several decks are open: tell her where to switch. */
+		canSwitch?: boolean;
 		onclose: () => void;
 	}
 
-	let { mode, category, onclose }: Props = $props();
+	let { mode, category, canSwitch = false, onclose }: Props = $props();
 	const tour = $derived(mode !== 'help');
 	const icon = $derived(CATEGORY_ICON[category]);
 
@@ -139,7 +141,10 @@
 				</li>
 			{/each}
 		</ul>
-		<p class="text-center text-xs text-taupe">The buttons under the card do the same.</p>
+		<p class="text-center text-xs text-taupe">
+			The buttons under the card do the same.
+			{#if canSwitch}Tap the icon at the top left to switch to something else.{/if}
+		</p>
 		<button class="btn-primary" onclick={onclose}>Got it</button>
 	{/if}
 </div>

@@ -3,18 +3,26 @@
 	import Icon from '#lib/components/ui/Icon.svelte';
 	import Logo from '#lib/components/ui/Logo.svelte';
 	import LogoutButton from '#lib/components/ui/LogoutButton.svelte';
+	import type { Category } from '#lib/domain/category.ts';
+	import DeckMenu from './DeckMenu.svelte';
 
 	interface Props {
 		preview: boolean;
 		/** Shows the "?" button when set. */
 		onhelp?: () => void;
+		/** Current deck and the ones she can switch to: a menu on the logo when there are several. */
+		decks?: { current: Category; list: { category: Category; pending: number }[] };
 	}
 
-	let { preview, onhelp }: Props = $props();
+	let { preview, onhelp, decks }: Props = $props();
 </script>
 
 <header class="flex items-center justify-between px-5 py-3">
-	<Logo />
+	{#if decks && decks.list.length > 1}
+		<DeckMenu current={decks.current} decks={decks.list} />
+	{:else}
+		<Logo />
+	{/if}
 	<div class="flex items-center gap-1">
 		{#if onhelp}
 			<button

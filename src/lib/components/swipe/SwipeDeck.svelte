@@ -8,7 +8,6 @@
 	import { CATEGORY_META, countLabel, type Category } from '#lib/domain/category.ts';
 	import type { Verdict } from '#lib/domain/ring.ts';
 	import AllDone from './AllDone.svelte';
-	import DeckSwitch from './DeckSwitch.svelte';
 	import MaybeSheet from './MaybeSheet.svelte';
 	import SwipeCard from './SwipeCard.svelte';
 	import SwipeGuide from './SwipeGuide.svelte';
@@ -120,25 +119,15 @@
 <svelte:window {onkeydown} />
 
 <div class="flex h-dvh flex-col overflow-hidden overscroll-none">
-	<SwipeHeader {preview} onhelp={top ? () => (guide = 'help') : undefined} />
-
-	{#if decks.length > 1}
-		<div class={preview ? 'pt-3' : ''}>
-			<DeckSwitch decks={liveDecks} current={category} />
-		</div>
-	{/if}
+	<SwipeHeader
+		{preview}
+		onhelp={top ? () => (guide = 'help') : undefined}
+		decks={{ current: category, list: liveDecks }}
+	/>
 
 	{#if top}
 		<main class="flex min-h-0 flex-1 flex-col items-center justify-center gap-6 px-5 pt-4 pb-6">
-			<div
-				class={[
-					'relative aspect-[4/5] w-full',
-					decks.length > 1
-						? 'max-w-[calc((100dvh-20.5rem)*0.8)]'
-						: 'max-w-[calc((100dvh-17rem)*0.8)]'
-				]}
-				aria-live="polite"
-			>
+			<div class="relative aspect-[4/5] w-full max-w-[calc((100dvh-17rem)*0.8)]" aria-live="polite">
 				{#each visible as picture (picture.id)}
 					<SwipeCard
 						bind:this={cards[picture.id]}
@@ -205,7 +194,7 @@
 {/if}
 
 {#if guide}
-	<SwipeGuide mode={guide} {category} onclose={closeGuide} />
+	<SwipeGuide mode={guide} {category} canSwitch={decks.length > 1} onclose={closeGuide} />
 {/if}
 
 <style>
