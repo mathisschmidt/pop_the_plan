@@ -5,7 +5,7 @@
 
 	const LINKS = [
 		{ href: '/admin/(app)', label: 'Overview', icon: 'home' },
-		{ href: '/admin/(app)/rings', label: 'Gallery', icon: 'ring' },
+		{ href: '/admin/(app)/rings', label: 'Gallery', icon: 'grid' },
 		{ href: '/admin/(app)/rings/new', label: 'Add', icon: 'plus' },
 		{ href: '/admin/(app)/settings', label: 'Settings', icon: 'settings' }
 	] as const satisfies readonly { href: string; label: string; icon: IconName }[];

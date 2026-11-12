@@ -1,20 +1,17 @@
 import { fail } from '@sveltejs/kit';
-import { isCategory } from '#lib/domain/category.ts';
 import { isRingStatus, ringImageUrl } from '#lib/domain/ring.ts';
 import { getServices } from '#lib/server/container.ts';
+import { readWorkingDeck } from '#lib/server/decks/working-deck.ts';
 import type { Actions, PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async ({ url }) => {
-	const deckParam = url.searchParams.get('deck');
-	const statusParam = url.searchParams.get('status');
-	const deck = isCategory(deckParam) ? deckParam : 'ring';
-	const status = isRingStatus(statusParam) ? statusParam : 'pending';
-	const { rings, decks } = await getServices();
+export const load: PageServerLoad = async ({ url, cookies }) => {
+	const param = url.searchParams.get('status');
+	const status = isRingStatus(param) ? param : 'pending';
+	const deck = readWorkingDeck(cookies);
+	const { rings } = await getServices();
 
 	return {
-		deck,
 		status,
-		openDecks: decks.open(),
 		counts: rings.counts(deck),
 		rings: rings.list(deck, status).map((ring) => ({
 			id: ring.id,

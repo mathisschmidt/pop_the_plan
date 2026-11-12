@@ -14,6 +14,10 @@ describe('authorize', () => {
 			loginPath: '/admin/login'
 		});
 		expect(authorize('/admin/rings', 'admin')).toEqual({ allowed: true });
+		expect(authorize('/admin/deck', 'guest')).toEqual({
+			allowed: false,
+			loginPath: '/admin/login'
+		});
 	});
 
 	it('lets both roles see the decks and media', () => {

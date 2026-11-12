@@ -2,16 +2,11 @@ import { fail } from '@sveltejs/kit';
 import { isCategory } from '#lib/domain/category.ts';
 import { getServices } from '#lib/server/container.ts';
 import { InvalidImageError } from '#lib/server/rings/image-processor.ts';
-import type { Actions, PageServerLoad } from './$types';
+import type { Actions } from './$types';
 
 const optionalUrl = (value: FormDataEntryValue | null) => {
 	if (typeof value !== 'string' || !value) return null;
 	return URL.canParse(value) ? value : null;
-};
-
-export const load: PageServerLoad = ({ url }) => {
-	const param = url.searchParams.get('deck');
-	return { deck: isCategory(param) ? param : 'ring' };
 };
 
 export const actions: Actions = {

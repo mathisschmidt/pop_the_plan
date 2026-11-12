@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import AdminNav from '#lib/components/admin/AdminNav.svelte';
-	import Logo from '#lib/components/ui/Logo.svelte';
+	import DeckMenu from '#lib/components/admin/DeckMenu.svelte';
 	import LogoutButton from '#lib/components/ui/LogoutButton.svelte';
 	import type { LayoutProps } from './$types';
 
@@ -9,7 +9,7 @@
 </script>
 
 <header class="flex items-center justify-between px-5 py-3">
-	<a href={resolve('/admin/(app)')}><Logo /></a>
+	<DeckMenu current={data.deck} open={data.openDecks} pending={data.pending} />
 	<LogoutButton />
 </header>
 

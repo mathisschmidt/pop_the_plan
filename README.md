@@ -21,9 +21,10 @@ The same swipe works for the **outfit you pick for her**: besides the **ring** d
 
 **For you** (`/admin`)
 
-- **Overview**: counts per verdict for each deck, her access status, and a _preview_ of her experience (your swipes there are never saved).
-- **Gallery**: filter by deck, then by _to review / love / nope / maybe_; read the "maybe" reasons, send a picture back for review, delete it, open its source link.
-- **Add a picture** (ring, dress or shoes) from your phone gallery or from an image URL, then **crop / zoom / rotate** it. Every picture is normalised to the same format: **1080×1350 WebP (4:5)**.
+- **Deck menu**: tap the icon next to _Pop the Plan_ (top left) to choose what you're working on: rings, dresses or shoes. Overview, Gallery and Add all follow it, and the choice is remembered on that device.
+- **Overview**: counts per verdict, her access status, and a _preview_ of her experience (your swipes there are never saved).
+- **Gallery**: filter by _to review / love / nope / maybe_; read the "maybe" reasons, send a picture back for review, delete it, open its source link.
+- **Add a picture** to the current deck from your phone gallery or from an image URL, then **crop / zoom / rotate** it. Every picture is normalised to the same format: **1080×1350 WebP (4:5)**.
 - **Settings**: choose which decks she can see, change your password, set or change her riddle and code, sign her out, or close her access.
 
 ## Stack

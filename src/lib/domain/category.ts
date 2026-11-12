@@ -13,6 +13,10 @@ export const DEFAULT_OPEN_CATEGORIES: readonly Category[] = ['ring'];
 export interface CategoryMeta {
 	/** Short label for tabs and pickers. */
 	label: string;
+	/** Heading of the admin gallery. */
+	title: string;
+	/** Heading of the admin "add" page. */
+	addTitle: string;
 	/** "1 ring left" / "3 rings left". */
 	unit: { one: string; other: string };
 	/** First words she reads when the deck opens. */
@@ -24,6 +28,8 @@ export interface CategoryMeta {
 export const CATEGORY_META: Record<Category, CategoryMeta> = {
 	ring: {
 		label: 'Ring',
+		title: 'Rings',
+		addTitle: 'Add a ring',
 		unit: { one: 'ring', other: 'rings' },
 		intro:
 			'A few rings are waiting for you. Tell me honestly what you think of each one, there is no wrong answer.',
@@ -37,6 +43,8 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
 	},
 	dress: {
 		label: 'Dress',
+		title: 'Dresses',
+		addTitle: 'Add a dress',
 		unit: { one: 'dress', other: 'dresses' },
 		intro:
 			'I picked a few dresses I would love to see you in. Tell me honestly what you think of each one.',
@@ -44,6 +52,8 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
 	},
 	shoes: {
 		label: 'Shoes',
+		title: 'Shoes',
+		addTitle: 'Add shoes',
 		unit: { one: 'pair', other: 'pairs' },
 		intro: 'A few pairs of shoes to go with it. Be honest, comfort counts too.',
 		suggestions: ['Heel too high', 'Heel too low', 'Not comfy', 'Not my colour', 'Too flashy']

@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import DeckTabs from '#lib/components/admin/DeckTabs.svelte';
+	import ClosedDeckNote from '#lib/components/admin/ClosedDeckNote.svelte';
 	import RingTile from '#lib/components/admin/RingTile.svelte';
 	import { STATUS_META } from '#lib/components/admin/statuses.ts';
 	import Icon from '#lib/components/ui/Icon.svelte';
@@ -12,22 +12,20 @@
 </script>
 
 <div class="flex items-end justify-between">
-	<h1 class="text-3xl">Gallery</h1>
-	<a href={resolve(`/admin/(app)/rings/new?deck=${data.deck}`)} class="btn-primary h-10 px-4"
+	<h1 class="text-3xl">{CATEGORY_META[data.deck].title}</h1>
+	<a href={resolve('/admin/(app)/rings/new')} class="btn-primary h-10 px-4"
 		><Icon name="plus" /> Add</a
 	>
 </div>
 
-<DeckTabs
-	current={data.deck}
-	open={data.openDecks}
-	href={(deck) => resolve(`/admin/(app)/rings?deck=${deck}&status=${data.status}`)}
-/>
+{#if !data.openDecks.includes(data.deck)}
+	<ClosedDeckNote />
+{/if}
 
 <nav class="-mx-5 flex gap-2 overflow-x-auto px-5 pb-1" aria-label="Filter by verdict">
 	{#each RING_STATUSES as status (status)}
 		<a
-			href={resolve(`/admin/(app)/rings?deck=${data.deck}&status=${status}`)}
+			href={resolve(`/admin/(app)/rings?status=${status}`)}
 			data-sveltekit-replacestate
 			data-sveltekit-noscroll
 			class={[
