@@ -29,7 +29,7 @@
 <DeckTabs
 	current={data.deck}
 	open={data.openDecks}
-	href={(deck) => resolve(`/admin/(app)?deck=${deck}`)}
+	href={(deck) => `${resolve('/admin/(app)')}?deck=${deck}`}
 />
 
 <section class="flex flex-col gap-3">
