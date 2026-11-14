@@ -18,12 +18,13 @@ The same swipe works for the **outfit you pick for her**: besides the **ring** d
 - On her first visit, a short **tour** shows each gesture with an animated mini-card. Afterwards, the **?** button in the header opens a one-page reminder. "Already seen" is remembered per device in `localStorage`; if storage isn't available, the tour just shows again.
 - Each newly opened deck gets a one-time intro card (the gestures tour is not repeated).
 - "Maybe, but…" opens a bottom sheet with quick suggestions and a free-text reason (required).
+- The **+** in the header lets her add a picture she loves herself (from her phone or an image link, with the same crop / zoom / rotate). It goes straight to _love_ in the current deck. Only in open decks; hidden in your preview.
 
 **For you** (`/admin`)
 
 - **Deck menu**: tap the icon next to _Pop the Plan_ (top left) to choose what you're working on: rings, dresses or shoes. Overview, Gallery and Add all follow it, and the choice is remembered on that device.
 - **Overview**: counts per verdict, her access status, and a _preview_ of her experience (your swipes there are never saved).
-- **Gallery**: filter by _to review / love / nope / maybe_; read the "maybe" reasons, send a picture back for review, delete it, open its source link.
+- **Gallery**: filter by _to review / love / nope / maybe_; read the "maybe" reasons, see the ones _added by her_, send a picture back for review (not hers), delete it, open its source link.
 - **Add a picture** to the current deck from your phone gallery or from an image URL, then **crop / zoom / rotate** it. Every picture is normalised to the same format: **1080×1350 WebP (4:5)**.
 - **Settings**: choose which decks she can see, change your password, set or change her riddle and code, sign her out, or close her access.
 
@@ -114,10 +115,10 @@ src/
 │   │   ├── security/           #   password hashing, rate limiter
 │   │   └── testing/            #   test fixtures (in-memory DB, temp dirs)
 │   ├── client/                 # Browser-only helpers (canvas crop/rotate)
-│   └── components/             # UI: ui/ (primitives), swipe/ (deck, cards, guide), admin/
+│   └── components/             # UI: ui/ (primitives), pictures/ (picker, cropper, upload form), swipe/ (deck, cards, guide), admin/
 └── routes/
     ├── login/                  # Her riddle login
-    ├── swipe/                  # Her home, [category=category] decks, POST /swipe/verdict/[id]
+    ├── swipe/                  # Her home, [category=category] decks and their /add page, POST /swipe/verdict/[id], GET /swipe/remote
     ├── rings/                  # Legacy redirect to /swipe
     ├── media/rings/[id]/       # Authenticated image serving
     ├── logout/

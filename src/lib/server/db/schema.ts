@@ -54,6 +54,10 @@ export const rings = sqliteTable(
 			.default('pending'),
 		reason: text('reason'),
 		sourceUrl: text('source_url'),
+		/** Who added the picture: the admin (for her to swipe) or her (straight to "love"). */
+		addedBy: text('added_by', { enum: ['admin', 'guest'] })
+			.notNull()
+			.default('admin'),
 		createdAt: timestamp('created_at').notNull(),
 		decidedAt: timestamp('decided_at')
 	},
@@ -61,6 +65,7 @@ export const rings = sqliteTable(
 		index('rings_category_status_idx').on(t.category, t.status, t.createdAt),
 		check('rings_category_check', sql`${t.category} in ('ring', 'dress', 'shoes')`),
 		check('rings_status_check', sql`${t.status} in ('pending', 'like', 'dislike', 'maybe')`),
+		check('rings_added_by_check', sql`${t.addedBy} in ('admin', 'guest')`),
 		check('rings_reason_check', sql`(${t.status} = 'maybe') = (${t.reason} is not null)`)
 	]
 );

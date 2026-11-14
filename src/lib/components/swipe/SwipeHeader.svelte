@@ -8,13 +8,15 @@
 
 	interface Props {
 		preview: boolean;
+		/** Shows the "+" button (add one she loves to this deck) when set. */
+		addTo?: Category;
 		/** Shows the "?" button when set. */
 		onhelp?: () => void;
 		/** Current deck and the ones she can switch to: a menu on the logo when there are several. */
 		decks?: { current: Category; list: { category: Category; pending: number }[] };
 	}
 
-	let { preview, onhelp, decks }: Props = $props();
+	let { preview, addTo, onhelp, decks }: Props = $props();
 </script>
 
 <header class="flex items-center justify-between px-5 py-3">
@@ -24,6 +26,15 @@
 		<Logo />
 	{/if}
 	<div class="flex items-center gap-1">
+		{#if addTo}
+			<a
+				href={resolve('/swipe/[category=category]/add', { category: addTo })}
+				class="grid size-10 place-items-center rounded-full text-rose active:bg-rose-soft"
+				aria-label="Add one I love"
+			>
+				<Icon name="plus" class="size-6" />
+			</a>
+		{/if}
 		{#if onhelp}
 			<button
 				class="grid size-10 place-items-center rounded-full text-taupe active:bg-line"

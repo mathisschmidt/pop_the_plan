@@ -121,6 +121,7 @@
 <div class="flex h-dvh flex-col overflow-hidden overscroll-none">
 	<SwipeHeader
 		{preview}
+		addTo={preview ? undefined : category}
 		onhelp={top ? () => (guide = 'help') : undefined}
 		decks={{ current: category, list: liveDecks }}
 	/>
@@ -181,7 +182,7 @@
 			</a>
 		</main>
 	{:else}
-		<AllDone {preview} />
+		<AllDone {preview} addTo={preview ? undefined : category} />
 	{/if}
 </div>
 

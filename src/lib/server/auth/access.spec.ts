@@ -24,6 +24,8 @@ describe('authorize', () => {
 		expect(authorize('/swipe', 'guest')).toEqual({ allowed: true });
 		expect(authorize('/swipe/dress', 'admin')).toEqual({ allowed: true });
 		expect(authorize('/swipe/verdict/abc', 'guest')).toEqual({ allowed: true });
+		expect(authorize('/swipe/ring/add', 'guest')).toEqual({ allowed: true });
+		expect(authorize('/swipe/remote', 'guest')).toEqual({ allowed: true });
 		expect(authorize('/rings', 'guest')).toEqual({ allowed: true });
 		expect(authorize('/media/rings/abc', 'admin')).toEqual({ allowed: true });
 		expect(authorize('/media/rings/abc', null)).toEqual({ allowed: false, loginPath: '/login' });
@@ -33,6 +35,8 @@ describe('authorize', () => {
 		expect(authorize('/swipe', null)).toEqual({ allowed: false, loginPath: '/login' });
 		expect(authorize('/swipe/shoes', null)).toEqual({ allowed: false, loginPath: '/login' });
 		expect(authorize('/swipe/verdict/abc', null)).toEqual({ allowed: false, loginPath: '/login' });
+		expect(authorize('/swipe/ring/add', null)).toEqual({ allowed: false, loginPath: '/login' });
+		expect(authorize('/swipe/remote', null)).toEqual({ allowed: false, loginPath: '/login' });
 		expect(authorize('/rings', null)).toEqual({ allowed: false, loginPath: '/login' });
 	});
 

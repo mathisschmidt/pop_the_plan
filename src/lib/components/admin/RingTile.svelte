@@ -3,15 +3,24 @@
 	import type { SubmitFunction } from '$app/forms';
 	import Icon from '#lib/components/ui/Icon.svelte';
 	import { toast } from '#lib/components/ui/Toast.svelte';
+	import type { RingAuthor } from '#lib/domain/ring.ts';
 
 	interface Props {
-		ring: { id: string; imageUrl: string; reason: string | null; sourceUrl: string | null };
+		ring: {
+			id: string;
+			imageUrl: string;
+			reason: string | null;
+			sourceUrl: string | null;
+			addedBy: RingAuthor;
+		};
 		/** Accessible description of the picture (the deck name). */
 		alt: string;
 		canReset: boolean;
 	}
 
 	let { ring, alt, canReset }: Props = $props();
+	// Hers were never in her pile: there is nothing to send back.
+	const fromHer = $derived(ring.addedBy === 'guest');
 	let busy = $state(false);
 
 	const submit: SubmitFunction = ({ action, cancel }) => {
@@ -33,12 +42,21 @@
 </script>
 
 <article class={['flex flex-col gap-2 transition', busy && 'opacity-50']}>
-	<img
-		src={ring.imageUrl}
-		{alt}
-		loading="lazy"
-		class="aspect-[4/5] w-full rounded-2xl bg-pearl object-cover"
-	/>
+	<div class="relative">
+		<img
+			src={ring.imageUrl}
+			{alt}
+			loading="lazy"
+			class="aspect-[4/5] w-full rounded-2xl bg-pearl object-cover"
+		/>
+		{#if fromHer}
+			<span
+				class="absolute top-2 left-2 flex items-center gap-1 rounded-full bg-pearl/90 px-2.5 py-1 text-xs text-rose shadow-sm"
+			>
+				<Icon name="heart" class="size-3" filled /> Added by her
+			</span>
+		{/if}
+	</div>
 
 	{#if ring.reason}
 		<p class="rounded-xl bg-champagne-soft px-3 py-2 font-serif text-sm text-ink italic">
@@ -61,7 +79,7 @@
 			</a>
 			<!-- eslint-enable svelte/no-navigation-without-resolve -->
 		{/if}
-		{#if canReset}
+		{#if canReset && !fromHer}
 			<button
 				formaction="?/reset"
 				class="grid size-9 place-items-center rounded-full text-taupe active:bg-line"

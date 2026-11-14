@@ -72,6 +72,35 @@ describe('RingService', () => {
 		expect(rings.decide(id, { verdict: 'like', reason: null })).toBe(true);
 	});
 
+	it('puts the pictures she adds straight into "love"', async () => {
+		const ring = await rings.addFromHer('dress', await samplePng(), 'https://shop.example/dress');
+
+		expect(ring).toMatchObject({ category: 'dress', status: 'like', addedBy: 'guest' });
+		expect(ring?.decidedAt).toBeInstanceOf(Date);
+		expect(rings.counts('dress')).toEqual({ pending: 0, like: 1, dislike: 0, maybe: 0 });
+		expect(rings.pendingCounts().dress).toBe(0);
+		expect(await rings.readImage(ring!.id)).toBeInstanceOf(Buffer);
+	});
+
+	it('marks the admin pictures as theirs', async () => {
+		expect(await rings.add('ring', await samplePng(), null)).toMatchObject({ addedBy: 'admin' });
+	});
+
+	it('refuses her pictures on a closed deck, without storing anything', async () => {
+		open = ['ring'];
+
+		expect(await rings.addFromHer('shoes', await samplePng(), null)).toBeNull();
+		expect(rings.counts('shoes').like).toBe(0);
+		expect(readdirSync(dir)).toHaveLength(0);
+	});
+
+	it('never sends one of hers back to her pile', async () => {
+		const ring = await rings.addFromHer('ring', await samplePng(), null);
+
+		expect(rings.resetVerdict(ring!.id)).toBe(false);
+		expect(rings.list('ring', 'like').map((r) => r.id)).toEqual([ring!.id]);
+	});
+
 	it('deletes the row and the file', async () => {
 		const { id } = await rings.add('ring', await samplePng(), null);
 

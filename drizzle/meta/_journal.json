@@ -15,6 +15,13 @@
       "when": 1794463259392,
       "tag": "0001_decks",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1794679330985,
+      "tag": "0002_added_by",
+      "breakpoints": true
     }
   ]
 }

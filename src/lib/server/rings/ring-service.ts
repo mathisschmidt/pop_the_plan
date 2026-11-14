@@ -1,6 +1,12 @@
 import { randomUUID } from 'node:crypto';
 import type { Category } from '#lib/domain/category.ts';
-import { RING_IMAGE, type Ring, type RingStatus, type VerdictInput } from '#lib/domain/ring.ts';
+import {
+	RING_IMAGE,
+	type Ring,
+	type RingAuthor,
+	type RingStatus,
+	type VerdictInput
+} from '#lib/domain/ring.ts';
 import type { ImageStore } from '../storage/image-store';
 import { normalizeRingImage } from './image-processor';
 import type { CategoryCounts, RingRepository, StatusCounts } from './ring-repository';
@@ -37,14 +43,35 @@ export class RingService {
 		return this.repository.countPendingByCategory();
 	}
 
-	/** @throws InvalidImageError when the upload is not a usable picture. */
-	async add(category: Category, image: Buffer, sourceUrl: string | null): Promise<Ring> {
+	/**
+	 * The admin adds a picture for her to swipe.
+	 * @throws InvalidImageError when the upload is not a usable picture.
+	 */
+	add(category: Category, image: Buffer, sourceUrl: string | null): Promise<Ring> {
+		return this.store(category, image, sourceUrl, 'admin');
+	}
+
+	/**
+	 * She adds one she loves: it goes straight to "like". Only in an open deck: returns null otherwise.
+	 * @throws InvalidImageError when the upload is not a usable picture.
+	 */
+	async addFromHer(category: Category, image: Buffer, sourceUrl: string | null) {
+		if (!this.decks.open().includes(category)) return null;
+		return this.store(category, image, sourceUrl, 'guest');
+	}
+
+	private async store(
+		category: Category,
+		image: Buffer,
+		sourceUrl: string | null,
+		addedBy: RingAuthor
+	): Promise<Ring> {
 		const processed = await normalizeRingImage(image);
 		const id = randomUUID();
 
 		await this.images.save(imageKey(id), processed);
 		try {
-			this.repository.insert({ id, category, sourceUrl, createdAt: this.now() });
+			this.repository.insert({ id, category, sourceUrl, addedBy, createdAt: this.now() });
 		} catch (err) {
 			await this.images.remove(imageKey(id));
 			throw err;

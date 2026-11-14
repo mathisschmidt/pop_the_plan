@@ -21,6 +21,8 @@ export interface CategoryMeta {
 	unit: { one: string; other: string };
 	/** First words she reads when the deck opens. */
 	intro: string;
+	/** Heading of her "add one you love" page. */
+	shareTitle: string;
 	/** Quick chips in the "Maybe, but…" sheet. */
 	suggestions: readonly string[];
 }
@@ -33,6 +35,7 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
 		unit: { one: 'ring', other: 'rings' },
 		intro:
 			'A few rings are waiting for you. Tell me honestly what you think of each one, there is no wrong answer.',
+		shareTitle: 'Seen a ring you love?',
 		suggestions: [
 			'Stone too big',
 			'Stone too small',
@@ -48,6 +51,7 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
 		unit: { one: 'dress', other: 'dresses' },
 		intro:
 			'I picked a few dresses I would love to see you in. Tell me honestly what you think of each one.',
+		shareTitle: 'Seen a dress you love?',
 		suggestions: ['Not my colour', 'Too formal', 'Too casual', 'Neckline', 'Length', 'Fabric']
 	},
 	shoes: {
@@ -56,6 +60,7 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
 		addTitle: 'Add shoes',
 		unit: { one: 'pair', other: 'pairs' },
 		intro: 'A few pairs of shoes to go with it. Be honest, comfort counts too.',
+		shareTitle: 'Seen shoes you love?',
 		suggestions: ['Heel too high', 'Heel too low', 'Not comfy', 'Not my colour', 'Too flashy']
 	}
 };

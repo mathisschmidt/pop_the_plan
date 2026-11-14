@@ -30,7 +30,7 @@ Before calling work done, run `npm run check && npm run lint && npm test`.
 lib/domain/   pure, shared client+server: types, constants, validation. No I/O, no deps.
 lib/server/   server-only. Services get deps via constructor; container.ts wires them.
 lib/client/   browser-only helpers (canvas).
-lib/components/{ui,rings,admin}/
+lib/components/{ui,pictures,swipe,admin}/
 routes/       thin: parse input → call service → map to HTTP / fail() / redirect.
 ```
 
@@ -39,6 +39,7 @@ routes/       thin: parse input → call service → map to HTTP / fail() / redi
 - **Access control is centralised** in `lib/server/auth/access.ts` (prefix rules) and enforced in `hooks.server.ts`. When you add a protected area, add a rule there and a test in `access.spec.ts`. Do not rely on layout `load` guards, because they do not protect actions or endpoints.
 - Roles: `admin` (single account, password) and `guest` (her, code + riddle). The admin can view `/swipe/*` in preview mode (any deck, even closed), but the verdict endpoint rejects admin votes (403).
 - Decks: `CATEGORIES` / `CATEGORY_META` in `domain/category.ts` (labels, units, intro, maybe-suggestions). Every picture row (table `rings`) has a `category`; open decks are stored in `app_settings.open_categories` and read via `DeckService`. Verdicts on a closed deck are refused. In the admin, the deck being worked on is a per-device cookie (`server/decks/working-deck.ts`), switched from the header menu (`admin/DeckMenu.svelte`, posts to `/admin/deck`). Her side uses the same logo menu (`swipe/DeckMenu.svelte`, plain links to `/swipe/[category]`); both are built on `ui/LogoMenu` + `ui/MenuRow`; admin pages read it with `readWorkingDeck(cookies)`, not from the URL.
+- She can add a picture she loves from the "+" in her header (`/swipe/[category]/add`): it goes straight to `like` with `added_by = 'guest'` (`RingService.addFromHer`, open decks only). The admin cannot send those back to review. Picker, cropper and upload form are shared with the admin in `components/pictures/`.
 - Every picture is normalised server-side to `RING_IMAGE` (1080×1350 WebP) by `normalizeRingImage`. The client crops to JPEG first. Keep the server as the source of truth.
 - Pictures are served only through `/media/rings/[id]` (auth required). Storage keys are generated (uuid), never user-provided.
 

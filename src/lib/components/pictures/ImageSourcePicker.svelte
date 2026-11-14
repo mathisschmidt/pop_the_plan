@@ -8,7 +8,13 @@
 		sourceUrl: string | null;
 	}
 
-	let { onpick }: { onpick: (image: PickedImage) => void } = $props();
+	interface Props {
+		onpick: (image: PickedImage) => void;
+		/** Same-origin proxy that downloads a picture from a link (see `remote-proxy.ts`). */
+		remoteEndpoint: string;
+	}
+
+	let { onpick, remoteEndpoint }: Props = $props();
 
 	let mode = $state<'file' | 'url'>('file');
 	let url = $state('');
@@ -31,7 +37,7 @@
 		error = null;
 		try {
 			// Goes through our server: a canvas cannot export images from other origins.
-			const response = await fetch(`/admin/rings/remote?url=${encodeURIComponent(url.trim())}`);
+			const response = await fetch(`${remoteEndpoint}?url=${encodeURIComponent(url.trim())}`);
 			if (!response.ok) {
 				const body = await response.json().catch(() => null);
 				throw new Error(body?.message ?? 'Could not load this image');
@@ -85,7 +91,7 @@
 				type="url"
 				inputmode="url"
 				class="input"
-				placeholder="https://…/ring.jpg"
+				placeholder="https://…/picture.jpg"
 				bind:value={url}
 				required
 			/>

@@ -22,12 +22,16 @@ export const RING_STATUSES: readonly RingStatus[] = ['pending', ...VERDICTS];
 
 export const REASON_MAX_LENGTH = 280;
 
+/** Who put a picture in a deck: the admin (for her to swipe), or her (one she loves). */
+export type RingAuthor = 'admin' | 'guest';
+
 export interface Ring {
 	id: string;
 	category: Category;
 	status: RingStatus;
 	reason: string | null;
 	sourceUrl: string | null;
+	addedBy: RingAuthor;
 	createdAt: Date;
 	decidedAt: Date | null;
 }

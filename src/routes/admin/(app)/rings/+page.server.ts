@@ -18,6 +18,7 @@ export const load: PageServerLoad = async ({ url, cookies }) => {
 			imageUrl: ringImageUrl(ring.id),
 			reason: ring.reason,
 			sourceUrl: ring.sourceUrl,
+			addedBy: ring.addedBy,
 			decidedAt: ring.decidedAt
 		}))
 	};

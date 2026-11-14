@@ -1,6 +1,6 @@
 import { and, asc, count, desc, eq, inArray } from 'drizzle-orm';
 import { CATEGORIES, type Category } from '#lib/domain/category.ts';
-import type { Ring, RingStatus, VerdictInput } from '#lib/domain/ring.ts';
+import type { Ring, RingAuthor, RingStatus, VerdictInput } from '#lib/domain/ring.ts';
 import type { Db } from '../db/client';
 import { rings } from '../db/schema';
 
@@ -15,8 +15,18 @@ export class RingRepository {
 		category: Category;
 		sourceUrl: string | null;
 		createdAt: Date;
+		/** Hers go straight to "like", decided when added. */
+		addedBy?: RingAuthor;
 	}): void {
-		this.db.insert(rings).values(ring).run();
+		const fromHer = ring.addedBy === 'guest';
+		this.db
+			.insert(rings)
+			.values({
+				...ring,
+				status: fromHer ? 'like' : 'pending',
+				decidedAt: fromHer ? ring.createdAt : null
+			})
+			.run();
 	}
 
 	findById(id: string): Ring | undefined {
@@ -78,11 +88,12 @@ export class RingRepository {
 		return result.changes === 1;
 	}
 
+	/** Only for the admin's pictures: hers were never in her pile. */
 	resetToPending(id: string): boolean {
 		const result = this.db
 			.update(rings)
 			.set({ status: 'pending', reason: null, decidedAt: null })
-			.where(eq(rings.id, id))
+			.where(and(eq(rings.id, id), eq(rings.addedBy, 'admin')))
 			.run();
 		return result.changes === 1;
 	}

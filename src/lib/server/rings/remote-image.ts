@@ -7,10 +7,10 @@ const TIMEOUT_MS = 10_000;
 const USER_AGENT = 'Mozilla/5.0 (compatible; PopThePlan/1.0; image import)';
 
 /**
- * Downloads a picture on the admin's behalf, so the browser can crop it
+ * Downloads a picture on the user's behalf, so the browser can crop it
  * without CORS issues (a canvas cannot export a cross-origin image).
  *
- * Only reachable by the authenticated admin. It still refuses non-HTTP(S)
+ * Only reachable by signed-in users (admin and her). It still refuses non-HTTP(S)
  * schemes, non-image responses and oversized bodies.
  */
 export async function fetchRemoteImage(
