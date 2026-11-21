@@ -46,7 +46,7 @@ export const rings = sqliteTable(
 	'rings',
 	{
 		id: text('id').primaryKey(),
-		category: text('category', { enum: ['ring', 'dress', 'shoes'] })
+		category: text('category', { enum: ['ring', 'dress', 'shoes', 'noel'] })
 			.notNull()
 			.default('ring'),
 		status: text('status', { enum: ['pending', 'like', 'dislike', 'maybe'] })
@@ -63,7 +63,7 @@ export const rings = sqliteTable(
 	},
 	(t) => [
 		index('rings_category_status_idx').on(t.category, t.status, t.createdAt),
-		check('rings_category_check', sql`${t.category} in ('ring', 'dress', 'shoes')`),
+		check('rings_category_check', sql`${t.category} in ('ring', 'dress', 'shoes', 'noel')`),
 		check('rings_status_check', sql`${t.status} in ('pending', 'like', 'dislike', 'maybe')`),
 		check('rings_added_by_check', sql`${t.addedBy} in ('admin', 'guest')`),
 		check('rings_reason_check', sql`(${t.status} = 'maybe') = (${t.reason} is not null)`)

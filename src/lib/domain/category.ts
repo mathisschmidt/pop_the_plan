@@ -1,10 +1,10 @@
 /**
- * Decks she can swipe: the ring, and the outfit picked for her. Shared by server and client,
+ * Decks she can swipe: the ring, the outfit picked for her, and Christmas gift ideas. Shared by server and client,
  * free of any runtime dependency. Keep in sync with the CHECK constraints in the DB schema.
  *
  * Wording stays deliberately vague: nothing here may hint at a special day.
  */
-export const CATEGORIES = ['ring', 'dress', 'shoes'] as const;
+export const CATEGORIES = ['ring', 'dress', 'shoes', 'noel'] as const;
 export type Category = (typeof CATEGORIES)[number];
 
 /** Decks open to her on a fresh install. */
@@ -62,6 +62,16 @@ export const CATEGORY_META: Record<Category, CategoryMeta> = {
 		intro: 'A few pairs of shoes to go with it. Be honest, comfort counts too.',
 		shareTitle: 'Seen shoes you love?',
 		suggestions: ['Heel too high', 'Heel too low', 'Not comfy', 'Not my colour', 'Too flashy']
+	},
+	noel: {
+		label: 'Noël',
+		title: 'Noël',
+		addTitle: 'Add a gift idea',
+		unit: { one: 'idea', other: 'ideas' },
+		intro:
+			'Christmas is coming! A few ideas to help me find the right gift. Yes, no or maybe, be honest.',
+		shareTitle: 'Seen something you would love?',
+		suggestions: ['Not my style', 'Not my colour', 'Already have one', 'Too pricey', 'Not useful']
 	}
 };
 

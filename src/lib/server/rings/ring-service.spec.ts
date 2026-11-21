@@ -14,7 +14,7 @@ describe('RingService', () => {
 
 	beforeEach(() => {
 		dir = tempDir();
-		open = ['ring', 'dress', 'shoes'];
+		open = ['ring', 'dress', 'shoes', 'noel'];
 		rings = new RingService(new RingRepository(testDb()), new ImageStore(dir), {
 			open: () => open
 		});
@@ -32,14 +32,15 @@ describe('RingService', () => {
 		const dress = await rings.add('dress', await samplePng(), null);
 		await rings.add('shoes', await samplePng(), null);
 		await rings.add('shoes', await samplePng(), null);
+		await rings.add('noel', await samplePng(), 'https://shop.example/gift');
 
 		expect(rings.list('dress', 'pending').map((r) => r.id)).toEqual([dress.id]);
 		expect(rings.list('ring', 'pending')).toEqual([]);
 		expect(rings.counts('shoes').pending).toBe(2);
-		expect(rings.pendingCounts()).toEqual({ ring: 0, dress: 1, shoes: 2 });
+		expect(rings.pendingCounts()).toEqual({ ring: 0, dress: 1, shoes: 2, noel: 1 });
 
 		rings.decide(dress.id, { verdict: 'like', reason: null });
-		expect(rings.pendingCounts()).toEqual({ ring: 0, dress: 0, shoes: 2 });
+		expect(rings.pendingCounts()).toEqual({ ring: 0, dress: 0, shoes: 2, noel: 1 });
 		expect(rings.counts('dress')).toEqual({ pending: 0, like: 1, dislike: 0, maybe: 0 });
 	});
 
