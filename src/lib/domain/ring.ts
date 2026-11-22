@@ -21,6 +21,7 @@ export type RingStatus = Verdict | 'pending';
 export const RING_STATUSES: readonly RingStatus[] = ['pending', ...VERDICTS];
 
 export const REASON_MAX_LENGTH = 280;
+export const LINK_MAX_LENGTH = 2048;
 
 /** Who put a picture in a deck: the admin (for her to swipe), or her (one she loves). */
 export type RingAuthor = 'admin' | 'guest';
@@ -61,6 +62,21 @@ export function parseVerdictInput(verdict: unknown, reason: unknown): ParseResul
 		return { ok: false, error: `Keep it under ${REASON_MAX_LENGTH} characters` };
 	}
 	return { ok: true, value: { verdict, reason: text } };
+}
+
+/**
+ * Optional link saved with a picture (the product page, or where the image came from).
+ * Only http(s): it ends up in an `href`.
+ */
+export function parseLink(value: unknown): ParseResult<string | null> {
+	const text = typeof value === 'string' ? value.trim() : '';
+	if (!text) return { ok: true, value: null };
+	if (text.length > LINK_MAX_LENGTH) return { ok: false, error: 'This link is too long' };
+	const url = URL.parse(text);
+	if (!url || (url.protocol !== 'http:' && url.protocol !== 'https:')) {
+		return { ok: false, error: 'This link does not look right' };
+	}
+	return { ok: true, value: url.href };
 }
 
 export function ringImageUrl(id: string): string {

@@ -1,12 +1,8 @@
 import { error, fail, redirect } from '@sveltejs/kit';
+import { parseLink } from '#lib/domain/ring.ts';
 import { getServices } from '#lib/server/container.ts';
 import { InvalidImageError } from '#lib/server/rings/image-processor.ts';
 import type { Actions, PageServerLoad } from './$types';
-
-const optionalUrl = (value: FormDataEntryValue | null) => {
-	if (typeof value !== 'string' || !value) return null;
-	return URL.canParse(value) ? value : null;
-};
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const { decks } = await getServices();
@@ -26,13 +22,15 @@ export const actions: Actions = {
 		if (!(image instanceof File) || image.size === 0) {
 			return fail(400, { error: 'Pick a picture first' });
 		}
+		const link = parseLink(form.get('sourceUrl'));
+		if (!link.ok) return fail(400, { error: link.error });
 
 		try {
 			const { rings } = await getServices();
 			const added = await rings.addFromHer(
 				params.category,
 				Buffer.from(await image.arrayBuffer()),
-				optionalUrl(form.get('sourceUrl'))
+				link.value
 			);
 			if (!added) return fail(409, { error: 'This one is closed for now' });
 		} catch (err) {

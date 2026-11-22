@@ -150,7 +150,7 @@ src/
 ```
 app_settings (singleton id=1)  admin_password_hash, admin_password_is_default, guest_code_hash, guest_hint, open_categories (JSON array)
 sessions                       id = sha256(token), role ∈ {admin, guest}, expires_at
-rings                          id (uuid), category ∈ {ring, dress, shoes, noel}, status ∈ {pending, like, dislike, maybe}, reason (iff maybe), source_url, created_at, decided_at
+rings                          id (uuid), category ∈ {ring, dress, shoes, noel}, status ∈ {pending, like, dislike, maybe}, reason (iff maybe), source_url (product link, else image address), created_at, decided_at
 ```
 
 The database enforces the invariants with CHECK constraints (singleton row, valid enums, `reason` present only for `maybe`).
