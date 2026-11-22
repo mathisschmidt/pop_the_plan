@@ -73,7 +73,7 @@
 				target="_blank"
 				rel="noopener noreferrer"
 				class="mr-auto grid size-9 place-items-center rounded-full text-taupe active:bg-line"
-				aria-label="Open source"
+				aria-label="Open link"
 			>
 				<Icon name="link" class="size-4" />
 			</a>
