@@ -1,8 +1,11 @@
 <script lang="ts">
+	import Icon from '#lib/components/ui/Icon.svelte';
 	import { swipeIntent, swipeProgress, type SwipeDirection } from './swipe';
 
 	interface Props {
 		imageUrl: string;
+		/** Product page saved with the picture, opened in a new tab. */
+		link?: string | null;
 		/** Accessible description of the picture. */
 		alt: string;
 		/** 0 = top card (draggable), 1 = the one peeking behind. */
@@ -14,7 +17,7 @@
 		onswipe: (direction: SwipeDirection) => boolean | Promise<boolean>;
 	}
 
-	let { imageUrl, alt, depth, onswipe }: Props = $props();
+	let { imageUrl, link = null, alt, depth, onswipe }: Props = $props();
 
 	const FLY_MS = 280;
 
@@ -110,6 +113,21 @@
 			class="stamp bottom-10 left-1/2 -translate-x-1/2 border-champagne text-champagne"
 			style:opacity={progress.down}>Maybe…</span
 		>
+		{#if link}
+			<!-- eslint-disable svelte/no-navigation-without-resolve -- external shop link -->
+			<!-- Stops the pointer here so a tap opens the link instead of starting a drag. -->
+			<a
+				href={link}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="absolute right-4 bottom-4 grid size-11 place-items-center rounded-full bg-pearl/90 text-ink shadow-card active:bg-line"
+				aria-label="Open the link"
+				onpointerdown={(event) => event.stopPropagation()}
+			>
+				<Icon name="link" class="size-5" />
+			</a>
+			<!-- eslint-enable svelte/no-navigation-without-resolve -->
+		{/if}
 	{/if}
 </div>
 

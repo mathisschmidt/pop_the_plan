@@ -1,6 +1,6 @@
 import { redirect } from '@sveltejs/kit';
 import { CATEGORIES } from '#lib/domain/category.ts';
-import { ringImageUrl } from '#lib/domain/ring.ts';
+import { parseLink, ringImageUrl } from '#lib/domain/ring.ts';
 import { getServices } from '#lib/server/container.ts';
 import type { PageServerLoad } from './$types';
 
@@ -16,9 +16,12 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	const pending = rings.pendingCounts();
 	return {
 		category,
-		pictures: rings
-			.list(category, 'pending')
-			.map((ring) => ({ id: ring.id, imageUrl: ringImageUrl(ring.id) })),
+		pictures: rings.list(category, 'pending').map((ring) => ({
+			id: ring.id,
+			imageUrl: ringImageUrl(ring.id),
+			// Re-checked: older rows were saved before links were validated, and this ends up in an href.
+			link: parseLink(ring.sourceUrl).ok ? ring.sourceUrl : null
+		})),
 		// A closed deck previewed by the admin still shows up in the switch.
 		decks: CATEGORIES.filter((c) => open.includes(c) || c === category).map((c) => ({
 			category: c,

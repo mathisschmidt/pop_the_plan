@@ -14,7 +14,7 @@
 	import SwipeHeader from './SwipeHeader.svelte';
 	import { DIRECTION_VERDICT, type SwipeDirection } from './swipe.ts';
 
-	type QueuedPicture = { id: string; imageUrl: string };
+	type QueuedPicture = { id: string; imageUrl: string; link: string | null };
 
 	interface Props {
 		category: Category;
@@ -133,6 +133,7 @@
 					<SwipeCard
 						bind:this={cards[picture.id]}
 						imageUrl={picture.imageUrl}
+						link={picture.link}
 						alt={meta.label}
 						depth={queue.indexOf(picture)}
 						onswipe={(direction) => handleSwipe(picture, direction)}
