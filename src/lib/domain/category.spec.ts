@@ -3,7 +3,7 @@ import { countLabel, isCategory, parseCategories } from './category';
 
 describe('isCategory', () => {
 	it('knows every deck', () => {
-		for (const c of ['ring', 'dress', 'shoes']) expect(isCategory(c)).toBe(true);
+		for (const c of ['ring', 'dress', 'shoes', 'noel']) expect(isCategory(c)).toBe(true);
 		expect(isCategory('hat')).toBe(false);
 		expect(isCategory(null)).toBe(false);
 	});
@@ -22,5 +22,6 @@ describe('countLabel', () => {
 		expect(countLabel('dress', 3)).toBe('3 dresses');
 		expect(countLabel('shoes', 2)).toBe('2 pairs');
 		expect(countLabel('shoes', 0)).toBe('0 pairs');
+		expect(countLabel('noel', 1)).toBe('1 idea');
 	});
 });
